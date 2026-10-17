@@ -17,3 +17,5 @@ class AgentState(TypedDict):
     analysis_result: Optional[Any]
     # 用户上传的CSV文件路径
     csv_file_path: Optional[str]
+    # 记录致命异常，供 CLI 顶层判断退出码（如 1 或 2）
+    error: Optional[str]

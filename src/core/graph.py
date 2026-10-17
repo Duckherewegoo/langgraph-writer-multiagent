@@ -11,19 +11,32 @@ from .nodes import (
 from mcp.client import MockMCPClient
 
 
-def build_agent_graph(llm, mcp_client: MockMCPClient, max_steps: int = 6):
+def build_agent_graph(llm, mcp_client: MockMCPClient):
     """构建完整智能体图"""
     graph = StateGraph(AgentState)
 
-    # 注册所有节点
+    # 注册所有节点（依赖注入）
     graph.add_node("input_moderation", input_moderation_node)
     graph.add_node("agent", lambda s: agent_node(s, llm, mcp_client))
     graph.add_node("tool_execution", lambda s: tool_execution_node(s, mcp_client))
     graph.add_node("final_analysis", final_analysis_node)
 
-    # 构建边与条件分支
+    # 审核后动态路由，拦截则直接结束
+    def route_after_moderation(state: AgentState) -> str:
+        if state.get("error") == "内容审核未通过":
+            return "final_analysis"
+        return "agent"
+
     graph.add_edge(START, "input_moderation")
-    graph.add_edge("input_moderation", "agent")
+    graph.add_conditional_edges(
+        "input_moderation",
+        route_after_moderation,
+        {
+            "agent": "agent",
+            "final_analysis": "final_analysis"
+        }
+    )
+
     graph.add_conditional_edges(
         "agent",
         loop_check_node,
@@ -39,7 +52,7 @@ def build_agent_graph(llm, mcp_client: MockMCPClient, max_steps: int = 6):
     memory = MemorySaver()
     compiled_graph = graph.compile(
         checkpointer=memory,
-        interrupt_before=["tool_execution"]  # 工具执行前中断，等待人工确认
+        interrupt_before=["tool_execution"]
     )
 
     return compiled_graph
