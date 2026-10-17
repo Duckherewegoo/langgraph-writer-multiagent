@@ -1,21 +1,66 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "langgraph-agent-demo"
+name = "langgraph-writer-multiagent"
 version = "0.1.0"
-description = "全特性LangGraph智能体工程化Demo"
+description = "基于 LangGraph 与 MCP 协议的 ReAct 智能体 CLI 写作与分析工具"
+readme = "README.md"
 requires-python = ">=3.11"
-dependencies = [
-    "langgraph>=0.2.30",
-    "langchain>=0.3.10",
-    "langchain-openai>=0.2.12",
-    "langchain-core>=0.3.20",
-    "pydantic>=2.10.0",
-    "pandas>=2.2.0",
-    "numexpr>=2.10.0",
-    "python-dotenv>=1.0.1",
-    "typing-extensions>=4.12.0",
-    "pyahocorasick>=2.3.1"
+license = { text = "GPL-3.0-or-later" }
+authors = [
+    { name = "DakeGinger", email = "dakeginger@qq.com" }
+]
+keywords = ["langgraph", "react-agent", "mcp", "cli", "llm"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
-[build-system]
-requires = ["setuptools>=68.0"]
-build-backend = "setuptools.build_meta"
+dependencies = [
+    "langgraph>=1.0.0",
+    "langchain-core>=1.0.0",
+    "langchain-openai>=1.0.0",
+    "mcp>=1.0.0",
+    "python-dotenv>=1.0.0",
+    "jieba>=0.42.1",
+    "pyahocorasick>=2.1.0",
+]
+
+[project.scripts]
+# 注册为系统命令，用户在终端输入 langgraph-writer 即可运行
+langgraph-writer = "main:main"
+
+[project.urls]
+Homepage = "https://github.com/DakeGinger/langgraph-writer-multiagent"
+Repository = "https://github.com/DakeGinger/langgraph-writer-multiagent.git"
+
+[tool.setuptools.packages.find]
+# 指定包搜索路径为根目录，包含所有 core, mcp, tools, utils
+where = ["."]
+include = ["core*", "mcp*", "tools*", "utils*"]
+
+# ==========================
+# 工具链配置 (极度克制版)
+# ==========================
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = [
+    "E501", # 行长度超限，交由 formatter 处理
+    "B008", # 函数默认参数中调用函数 (typer/dash 等常见)
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
