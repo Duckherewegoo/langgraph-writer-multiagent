@@ -1,17 +1,17 @@
+import argparse
 import os
 import sys
 import uuid
-import argparse
+
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
+from langchain_openai import ChatOpenAI
+
+from core.graph import build_agent_graph
+from mcp.client import RealMCPClient
 
 # 加载环境变量必须放在最前面，防止内部模块导入时读不到
 load_dotenv()
-
-from core.graph import build_agent_graph
-from mcp.client import MockMCPClient
-
 
 def init_dependencies():
     """初始化并校验依赖"""
@@ -38,7 +38,7 @@ def init_dependencies():
         max_retries=2
     )
 
-    mcp_client = MockMCPClient(llm=llm)  # 注意：按我们之前改的，可能需要传 llm
+    mcp_client = RealMCPClient(llm=llm)  # 注意：按我们之前改的，可能需要传 llm
     mcp_client.connect()
     
     agent_graph = build_agent_graph(llm, mcp_client, max_steps=max_steps)

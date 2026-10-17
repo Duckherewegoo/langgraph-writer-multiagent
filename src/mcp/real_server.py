@@ -1,4 +1,5 @@
 import sys
+
 import jieba
 from mcp.server.fastmcp import FastMCP
 

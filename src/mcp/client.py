@@ -1,14 +1,17 @@
 import asyncio
 import sys
-from typing import List, Dict, Any
+from typing import Any
+
 from langchain_core.tools import tool
-from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+
+from mcp import ClientSession, StdioServerParameters
+
 
 class RealMCPClient:
     """真实 MCP 协议客户端 (同步 CLI 版本)"""
     
-    def __init__(self, command: str, args: List[str]):
+    def __init__(self, command: str, args: list[str]):
         """
         初始化客户端
         :param command: 启动 MCP 服务端的命令 (如 "python", "npx", "uv")
@@ -16,7 +19,7 @@ class RealMCPClient:
         """
         self.command = command
         self.args = args
-        self._tools_cache: Dict[str, Any] = {}
+        self._tools_cache: dict[str, Any] = {}
         self._connected = False
 
     def _run_async(self, coro):
@@ -44,9 +47,9 @@ class RealMCPClient:
             self._connected = True
         except Exception as e:
             self._connected = False
-            raise RuntimeError(f"MCP 服务端连接失败 ({self.command} {' '.join(self.args)}): {e}")
+            raise RuntimeError(f"MCP 服务端连接失败 ({self.command} {' '.join(self.args)}): {e}") from e
 
-    def list_tools(self) -> Dict[str, Any]:
+    def list_tools(self) -> dict[str, Any]:
         if not self._connected:
             raise RuntimeError("MCP客户端未连接")
         return self._tools_cache
@@ -67,7 +70,7 @@ class RealMCPClient:
 
         return self._run_async(_call())
 
-    def get_langchain_tools(self) -> List:
+    def get_langchain_tools(self) -> list:
         """将真实 MCP 工具转换为 LangChain Tool"""
         if not self._connected:
             self.connect()

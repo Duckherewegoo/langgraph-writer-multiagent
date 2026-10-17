@@ -1,5 +1,5 @@
-from langchain_core.tools import tool
 import numexpr
+from langchain_core.tools import tool
 
 
 @tool

@@ -1,6 +1,8 @@
-from openai import OpenAI
 import os
 import sys
+
+from openai import OpenAI
+
 
 def create_llm():
     # 启动前置校验，拒绝带病运行

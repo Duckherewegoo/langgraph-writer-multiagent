@@ -1,7 +1,8 @@
-from typing import List
-from langchain_core.messages import BaseMessage, SystemMessage, ToolMessage, AIMessage
 
-def trim_messages(messages: List[BaseMessage], max_count: int = 12) -> List[BaseMessage]:
+from langchain_core.messages import BaseMessage, SystemMessage, ToolMessage
+
+
+def trim_messages(messages: list[BaseMessage], max_count: int = 12) -> list[BaseMessage]:
     """
     截断对话历史，保留最近消息，控制上下文长度。
     增加了安全兜底：防止 ToolMessage 孤悬，防止单条超长。

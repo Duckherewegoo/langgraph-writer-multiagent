@@ -1,9 +1,7 @@
 import logging
-from typing import List, Optional
-from langchain_core.messages import (
-    BaseMessage, SystemMessage, HumanMessage, AIMessage
-)
+
 from langchain_core.language_models import BaseChatModel
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
 
 logger = logging.getLogger(__name__)
@@ -22,7 +20,7 @@ SUMMARY_PROMPT = ChatPromptTemplate.from_messages([
 ])
 
 
-def summarize_chat_history(llm: BaseChatModel, chat_messages: List[BaseMessage]) -> str:
+def summarize_chat_history(llm: BaseChatModel, chat_messages: list[BaseMessage]) -> str:
     """调用LLM对一段对话消息列表生成摘要文本"""
     history_blocks = []
     for msg in chat_messages:
@@ -48,18 +46,18 @@ def summarize_chat_history(llm: BaseChatModel, chat_messages: List[BaseMessage])
     except Exception as e:
         logger.error(f"上下文摘要生成失败: {e}")
         # 果总结失败，直接返回一个简单的截断标记
-        return f"【早前对话因过长已直接截断】"
+        return "【早前对话因过长已直接截断】"
 
 
 def compress_context_messages(
     llm: BaseChatModel,
-    messages: List[BaseMessage],
+    messages: list[BaseMessage],
     max_recent_rounds: int = 6,
     token_threshold: int = 1800
-) -> List[BaseMessage]:
+) -> list[BaseMessage]:
     """核心工具：自动压缩上下文消息"""
-    system_msgs: List[SystemMessage] = []
-    chat_msgs: List[BaseMessage] = []
+    system_msgs: list[SystemMessage] = []
+    chat_msgs: list[BaseMessage] = []
     
     for m in messages:
         if isinstance(m, SystemMessage):
@@ -107,10 +105,10 @@ def compress_context_messages(
 
 def auto_trim_and_summarize(
     llm: BaseChatModel,
-    messages: List[BaseMessage],
+    messages: list[BaseMessage],
     max_retain: int = 8,
     threshold_tokens: int = 2000
-) -> List[BaseMessage]:
+) -> list[BaseMessage]:
     """对外简易入口"""
     return compress_context_messages(
         llm=llm,

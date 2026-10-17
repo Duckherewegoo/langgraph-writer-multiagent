@@ -1,7 +1,7 @@
-import os
-import sys
+from typing import Any
+
 import jieba
-from typing import Dict, Any, Callable
+
 from utils.context_summarizer import auto_trim_and_summarize
 
 
@@ -13,7 +13,7 @@ class MockMCPServer:
         :param llm: LangChain 兼容的 Chat 模型，或原生 OpenAI client
         """
         self.llm = llm
-        self._tools: Dict[str, Dict[str, Any]] = {}
+        self._tools: dict[str, dict[str, Any]] = {}
         self._register_default_tools()
 
     def _register_default_tools(self):
@@ -41,11 +41,11 @@ class MockMCPServer:
             "handler": self._keyword_handler
         }
 
-    def list_tools(self) -> Dict[str, Dict[str, Any]]:
+    def list_tools(self) -> dict[str, dict[str, Any]]:
         """列出所有可用工具（MCP标准接口）"""
         return self._tools
 
-    def call_tool(self, tool_name: str, args: Dict[str, Any]) -> str:
+    def call_tool(self, tool_name: str, args: dict[str, Any]) -> str:
         """调用工具（MCP标准接口）"""
         if tool_name not in self._tools:
             return f"MCP错误：工具 {tool_name} 不存在"

@@ -1,6 +1,5 @@
-from pathlib import Path
-from typing import Tuple, Set, Optional
 import logging
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -15,10 +14,10 @@ except ImportError:
 
 # 全局缓存，惰性加载
 _SENSITIVE_AC = None
-_FALLBACK_WORDS: Set[str] = set()
+_FALLBACK_WORDS: set[str] = set()
 
 
-def _load_vocab(vocab_dir: str) -> Set[str]:
+def _load_vocab(vocab_dir: str) -> set[str]:
     """加载词库，返回去重后的词条集合"""
     vocab_path = Path(vocab_dir)
     if not vocab_path.exists() or not vocab_path.is_dir():
@@ -28,7 +27,7 @@ def _load_vocab(vocab_dir: str) -> Set[str]:
     all_words = set()
     for txt_file in vocab_path.glob("*.txt"):
         try:
-            with open(txt_file, "r", encoding="utf-8") as f:
+            with open(txt_file, encoding="utf-8") as f:
                 for line in f:
                     word = line.strip()
                     if word:
@@ -65,7 +64,7 @@ def _get_automaton(vocab_dir: str):
         logger.info(f"词库加载完成（纯Python）：共加载 {len(all_words)} 个敏感词")
 
 
-def moderate_content(content: str, vocab_dir: Optional[str] = None) -> Tuple[bool, str]:
+def moderate_content(content: str, vocab_dir: str | None = None) -> tuple[bool, str]:
     """
     内容安全审核，找到第一个匹配就返回。
     :param vocab_dir: 词库路径。建议在 main.py 启动时传绝对路径进来。

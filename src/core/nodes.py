@@ -1,12 +1,15 @@
-from typing import Dict, Any
-from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
-from .state import AgentState
-from utils.content_moderation import moderate_content
-from utils.context_trimmer import trim_messages
+from typing import Any
+
+from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
+
+from mcp.client import MockMCPClient
 from tools.calculator import calculator
 from tools.csv_analyzer import csv_analyzer
 from tools.weather import get_weather
-from mcp.client import MockMCPClient
+from utils.content_moderation import moderate_content
+from utils.context_trimmer import trim_messages
+
+from .state import AgentState
 
 # 建立工具映射表，消灭 if/elif 地狱，新增工具只需在这里注册
 LOCAL_TOOLS = {
@@ -34,7 +37,7 @@ def _get_all_tools(mcp_client: MockMCPClient):
     return local_tools + mcp_tools
 
 
-def input_moderation_node(state: AgentState) -> Dict[str, Any]:
+def input_moderation_node(state: AgentState) -> dict[str, Any]:
     """内容审核节点：校验用户输入合法性"""
     last_msg = state["messages"][-1]
     if not isinstance(last_msg, HumanMessage):
@@ -53,7 +56,7 @@ def input_moderation_node(state: AgentState) -> Dict[str, Any]:
     return {"loop_count": state["loop_count"]}
 
 
-def agent_node(state: AgentState, llm, mcp_client: MockMCPClient) -> Dict[str, Any]:
+def agent_node(state: AgentState, llm, mcp_client: MockMCPClient) -> dict[str, Any]:
     """ReAct推理节点：生成思考与工具调用"""
     # 先截断上下文，控制Token消耗
     trimmed_messages = trim_messages(state["messages"], state.get("max_steps", 12))
@@ -70,7 +73,7 @@ def agent_node(state: AgentState, llm, mcp_client: MockMCPClient) -> Dict[str, A
     }
 
 
-def tool_execution_node(state: AgentState, mcp_client: MockMCPClient) -> Dict[str, Any]:
+def tool_execution_node(state: AgentState, mcp_client: MockMCPClient) -> dict[str, Any]:
     """工具执行节点：统一执行本地工具与MCP工具"""
     last_msg = state["messages"][-1]
     if not hasattr(last_msg, "tool_calls") or not last_msg.tool_calls:
@@ -122,7 +125,7 @@ def loop_check_node(state: AgentState) -> str:
     return "final_analysis"
 
 
-def final_analysis_node(state: AgentState) -> Dict[str, Any]:
+def final_analysis_node(state: AgentState) -> dict[str, Any]:
     """最终分析写作节点：整合所有信息输出专业报告"""
     # 如果是审核未通过，直接输出拒绝信息
     if state.get("error") == "内容审核未通过":
