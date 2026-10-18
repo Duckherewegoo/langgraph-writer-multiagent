@@ -84,7 +84,7 @@ def run_task(agent_graph, max_steps, user_input: str):
             print(f"\n❌ 任务失败: {result['error']}", file=sys.stderr)
             sys.exit(1)
             
-        print("\n✅ 结果：")
+        print("\n结果：")
         print(result.get("analysis_result", "无结果"))
         
     except KeyboardInterrupt:
